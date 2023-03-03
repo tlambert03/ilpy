@@ -1,0 +1,44 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.platform }}
+    defaults:
+      run:
+        shell: bash -el {0} # needed when using setup-miniconda
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: '3.10'
+          mamba-version: "*"
+          channels: conda-forge
+          channel-priority: true
+      - name: install conda build
+        run: mamba install conda-build conda-verify anaconda-client
+      - name: build package
+        run: |
+          mkdir bld
+          conda build -c conda-forge -c gurobi --output-folder bld conda
+          ls -l bld
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-archives
+          path: | 
+            bld/linux-64/*.tar.bz2
+            bld/osx-64/*.tar.bz2
+      # - name: upload to anaconda
+      #   run: |
+      #     anaconda upload bld/linux-64/*.tar.bz2
+      #     anaconda upload bld/osx-64/*.tar.bz2
+      #   env:
+      #     ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
