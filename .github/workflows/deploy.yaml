@@ -12,6 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        python-version: ['3.9', '3.10', '3.11']
         platform: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@v3
@@ -19,7 +20,7 @@ jobs:
           submodules: true
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: '3.10'
+          python-version: ${{ matrix.python-version }}
           mamba-version: "*"
           channels: conda-forge
           channel-priority: true
@@ -28,7 +29,7 @@ jobs:
       - name: build package
         run: |
           mkdir bld
-          conda build -c conda-forge -c gurobi --output-folder bld conda
+          conda build -c conda-forge -c gurobi --output-folder bld --python=${{ matrix.python-version }} conda
           ls -l bld
       - uses: actions/upload-artifact@v3
         with:
