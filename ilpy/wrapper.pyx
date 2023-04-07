@@ -6,6 +6,8 @@ from libcpp.map cimport map as cppmap
 from libcpp.string cimport string
 from cython.operator cimport dereference as deref
 cimport decl
+from .expressions import Expression
+
 
 ####################################
 # Enums                            #
@@ -186,14 +188,24 @@ cdef class Solver:
         self.num_variables = num_variables
         deref(self.p).initialize(num_variables, default_variable_type, vtypes)
 
-    def set_objective(self, Objective objective):
-        deref(self.p).setObjective(objective.p[0])
+    def set_objective(self, objective: Objective | Expression):
+        cdef Objective _objective
+        if isinstance(objective, Expression):
+            _objective = objective.as_objective()
+        else:
+            _objective = objective
+        deref(self.p).setObjective(_objective.p[0])
 
     def set_constraints(self, Constraints constraints):
         deref(self.p).setConstraints(constraints.p[0])
 
-    def add_constraint(self, Constraint constraint):
-        deref(self.p).addConstraint(constraint.p[0])
+    def add_constraint(self, constraint: Constraint | Expression):
+        cdef Constraint _constraint
+        if isinstance(constraint, Expression):
+            _constraint = constraint.as_constraint()
+        else:
+            _constraint = constraint
+        deref(self.p).addConstraint(_constraint.p[0])
 
     def set_timeout(self, timeout):
         deref(self.p).setTimeout(timeout)

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import ast
-from typing import Any, Sequence, Union
+from typing import TYPE_CHECKING, Any, Sequence, Union
 
-from ilpy.wrapper import Constraint, Objective, Relation, Sense
+if TYPE_CHECKING:
+    from ilpy.wrapper import Constraint, Objective, Relation, Sense
 
 Number = Union[float, int]
 
@@ -26,7 +27,7 @@ class Expression(ast.AST):
         """Create a linear constraint from this expression."""
         return _expression_to_constraint(self)
 
-    def as_objective(self, sense: Sense = Sense.Minimize) -> Objective:
+    def as_objective(self, sense: Sense | None = None) -> Objective:
         """Create a linear objective from this expression."""
         return _expression_to_objective(self, sense=sense)
 
@@ -207,16 +208,17 @@ class Variable(Expression, ast.Name):
         return id(self)
 
 
-# conversion between ast comparison operators and ilpy relations
-# TODO: support more less/greater than operators
-OPERATOR_MAP: dict[type[ast.cmpop], Relation] = {
-    ast.LtE: Relation.LessEqual,
-    ast.Eq: Relation.Equal,
-    ast.GtE: Relation.GreaterEqual,
-}
-
-
 def _get_relation(expr: Expression) -> Relation | None:
+    from ilpy.wrapper import Relation
+
+    # conversion between ast comparison operators and ilpy relations
+    # TODO: support more less/greater than operators
+    OPERATOR_MAP: dict[type[ast.cmpop], Relation] = {
+        ast.LtE: Relation.LessEqual,
+        ast.Eq: Relation.Equal,
+        ast.GtE: Relation.GreaterEqual,
+    }
+
     seen_compare = False
     relation: Relation | None = None
     for sub in ast.walk(expr):
@@ -235,6 +237,8 @@ def _get_relation(expr: Expression) -> Relation | None:
 
 def _expression_to_constraint(expr: Expression) -> Constraint:
     """Convert an expression to a `Constraint`."""
+    from ilpy.wrapper import Constraint
+
     constraint = Constraint()
     if relation := _get_relation(expr):
         constraint.set_relation(relation)
@@ -265,14 +269,16 @@ def _ensure_index(var: Variable) -> int:
     return var.index
 
 
-def _expression_to_objective(
-    expr: Expression, sense: Sense = Sense.Minimize
-) -> Objective:
+def _expression_to_objective(expr: Expression, sense: Sense | None = None) -> Objective:
     """Convert an expression to an `Objective`."""
+    from ilpy.wrapper import Objective, Sense
+
     if _get_relation(expr) is not None:
         # TODO: may be supported in the future, eg. for piecewise objectives?
         raise ValueError(f"Objective function cannot have comparisons: {expr}")
 
+    if sense is None:
+        sense = Sense.Minimize
     objective = Objective()
 
     for var, coef in _get_coefficients(expr).items():

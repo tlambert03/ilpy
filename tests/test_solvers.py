@@ -28,22 +28,23 @@ def test_simple_solver(preference: ilpy.Preference, as_expression: bool) -> None
     )
 
     _e: Expression
-    # objective function
+    objective: ilpy.Objective | Expression
+    constraint: ilpy.Constraint | Expression
+    # objective function : a + b + c + d + e + 0.5f + g + h + i + j
     if as_expression:
         # note: the Constant(0) here is only to satisfy mypy... it would work without
         _e = sum((Variable(str(i), index=i) for i in range(num_vars)), Constant(0))
-        _e += 0.5 * Variable(str(special_var), index=special_var)
-        objective = _e.as_objective()
+        objective = _e - 0.5 * Variable(str(special_var), index=special_var)
     else:
         objective = ilpy.Objective()
         for i in range(num_vars):
             objective.set_coefficient(i, 1.0)
         objective.set_coefficient(special_var, 0.5)
 
-    # constraints
+    # constraint : a + b + c + d + e + f + g + h + i + j = 1
     if as_expression:
         _e = sum((Variable(str(i), index=i) for i in range(num_vars)), Constant(0))
-        constraint = (_e == 1).as_constraint()
+        constraint = _e == 1
     else:
         constraint = ilpy.Constraint()
         for i in range(num_vars):
@@ -55,7 +56,6 @@ def test_simple_solver(preference: ilpy.Preference, as_expression: bool) -> None
     solver.add_constraint(constraint)
 
     solution, _ = solver.solve()
-
     assert solution[5] == 1
 
 
@@ -75,6 +75,9 @@ def test_quadratic_solver(preference: ilpy.Preference, as_expression: bool) -> N
         preference,
     )
 
+    objective: ilpy.Objective | Expression
+    constraint: ilpy.Constraint | Expression
+
     # objective function
     objective = ilpy.Objective()
     for i in range(num_vars):
@@ -84,9 +87,8 @@ def test_quadratic_solver(preference: ilpy.Preference, as_expression: bool) -> N
 
     # constraints
     if as_expression:
-        pytest.skip(reason="quadratic expressions not yet implemented")
-        s = sum(Variable(str(i), index=i) for i in range(num_vars))
-        constraint = (s == 1).constraint()  # type: ignore
+        s = sum((Variable(str(i), index=i) for i in range(num_vars)), Constant(0))
+        constraint = (s == 1).as_constraint()
     else:
         constraint = ilpy.Constraint()
         for i in range(num_vars):
@@ -99,5 +101,4 @@ def test_quadratic_solver(preference: ilpy.Preference, as_expression: bool) -> N
     solver.add_constraint(constraint)
 
     solution, _ = solver.solve()
-
     assert solution[5] == -2  # jan please check
