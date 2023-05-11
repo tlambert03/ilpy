@@ -29,6 +29,13 @@ dev = [
     "numpy",
     "gurobipy",  # used on CI to confirm equality of results
 ]
+docs = [
+    "sphinx",
+    "sphinx_rtd_theme",
+    "sphinx_togglebutton",
+    "tomli",
+    "jupyter_sphinx",
+]
 
 [project.urls]
 homepage = "https://github.com/funkelab/ilpy"

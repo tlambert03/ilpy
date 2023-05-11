@@ -80,6 +80,7 @@ cdef class Solution:
         return self._status.decode("UTF-8")
 
 cdef class Objective:
+    """Docstring for objective."""
 
     cdef decl.Objective* p
 

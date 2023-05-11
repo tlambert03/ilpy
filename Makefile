@@ -1,4 +1,4 @@
-.PHONY: default install-dev tests clean
+.PHONY: default install-dev tests clean docs docs-watch
 
 default:
 	pip install .
@@ -14,3 +14,10 @@ clean:
 	rm -rf build dist
 	rm -rf ilpy/*.cpp
 	rm -rf ilpy/*.so
+
+docs:
+	make -C docs html
+
+docs-watch:
+	pip install sphinx-autobuild
+	sphinx-autobuild docs/source docs/_build/html

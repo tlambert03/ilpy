@@ -1,0 +1,13 @@
+site_name: My Docs
+
+theme:
+    name: readthedocs
+
+plugins:
+- search
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          show_root_heading: true
+          filters: ["!^_[^_]"]
