@@ -1,13 +1,32 @@
 site_name: My Docs
 
 theme:
-    name: readthedocs
+  name: readthedocs
+
+nav:
+  - install.md
+  - quickstart.md
+  - api.md
+
+watch:
+  - ilpy
+  - ilpy/wrapper.pyi
+
+markdown_extensions:
+  - toc:
+      permalink: True
 
 plugins:
-- search
-- mkdocstrings:
-    handlers:
-      python:
-        options:
-          show_root_heading: true
-          filters: ["!^_[^_]"]
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: false
+            show_root_heading: true
+            # show_signature_annotations: true
+            show_if_no_docstring: true
+            annotations_path: source
+
+extra_css:
+  - css/extra.css

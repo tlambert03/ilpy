@@ -52,3 +52,25 @@ togglebutton_hint = ""
 togglebutton_hint_hide = ""
 
 pygments_style = "lovelace"
+
+autodoc_typehints = "both"
+autodoc_docstring_signature = True
+autodoc_default_options = {
+    # 'member-order': 'bysource',
+    'members': True,
+    'undoc-members': True,
+    
+    # 'members': ...,
+    # 'member-order': ...,
+    # 'undoc-members': ...,
+    # 'private-members': ...,
+    # 'special-members': ...,
+    # 'inherited-members': ...,
+    # 'show-inheritance': ...,
+    # 'ignore-module-all': ...,
+    # 'imported-members': ...,
+    # 'exclude-members': ...,
+    # 'class-doc-from': ...,
+    # 'no-value': ...,
+
+}

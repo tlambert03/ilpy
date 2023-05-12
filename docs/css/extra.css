@@ -1,0 +1,8 @@
+div.doc.doc-contents {
+  font-size: smaller;
+  padding-left: 1.5rem;
+}
+
+div.doc.doc-contents.first {
+  border-left: 2px solid #22125e3e;
+}

@@ -80,7 +80,6 @@ cdef class Solution:
         return self._status.decode("UTF-8")
 
 cdef class Objective:
-    """Docstring for objective."""
 
     cdef decl.Objective* p
 
@@ -129,6 +128,17 @@ cdef class Objective:
         constant: float = 0,
         sense: Sense = Sense.Minimize,
     ) -> Objective:
+        """Create an objective from coefficients.
+        
+        Args:
+            coefficients: A sequence or mapping of coefficients.
+            quadratic_coefficients: A mapping or iterable of quadratic coefficients.
+            constant: The constant term.
+            sense: The sense of the objective.
+        
+        Returns:
+            An objective.
+        """
         obj = cls()
         iter_coeffs = (
             coefficients.items()
@@ -150,6 +160,7 @@ cdef class Objective:
         return obj
 
 cdef class Constraint:
+    """Docstring in Cython."""
 
     cdef decl.Constraint* p
 
@@ -243,7 +254,12 @@ cdef class Constraints:
         return self.p.size()
 
 cdef class Solver:
-
+    """A Solver is a solver.
+    
+    Args:
+        default_variable_type: The default type of variables in the problem.
+        variable_types: A mapping from variable indices to variable types.
+    """
     cdef shared_ptr[decl.SolverBackend] p
     cdef unsigned int num_variables
 

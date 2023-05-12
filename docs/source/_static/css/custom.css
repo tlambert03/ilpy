@@ -22,17 +22,17 @@ a:hover {
   color: var(--color-c);
 }
 
-.wy-menu-vertical a {
+/* .wy-menu-vertical a {
   filter: brightness(1.8);
-}
+} */
 
 .wy-menu-vertical a:active {
   background-color: var(--color-b);
 }
 
-.wy-menu-vertical a:visited {
+/* .wy-menu-vertical a:visited {
   filter: brightness(1.8);
-}
+} */
 
 .rst-content .admonition-title {
   background: var(--color-a);
