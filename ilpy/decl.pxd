@@ -102,15 +102,10 @@ cdef extern from "impl/solvers/SolverBackend.h":
         bool solve(Solution& solution, string& message) except +
         void setEventCallback(PyObject* callback)
 
-cdef extern from "impl/solvers/ScipBackend.cpp":
-    pass
 
-cdef extern from "impl/solvers/GurobiBackend.cpp":
-    pass
+# cdef extern from "impl/solvers/SolverFactory.cpp":
+#     pass
 
-cdef extern from "impl/solvers/SolverFactory.cpp":
-    pass
-
-cdef extern from "impl/solvers/SolverFactory.h":
-    cdef cppclass SolverFactory:
-        shared_ptr[SolverBackend] createSolverBackend(Preference) except +
+# cdef extern from "impl/solvers/SolverFactory.h":
+#     cdef cppclass SolverFactory:
+#         shared_ptr[SolverBackend] createSolverBackend(Preference) except +

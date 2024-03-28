@@ -242,6 +242,26 @@ cdef class Constraints:
     def __len__(self):
         return self.p.size()
 
+def load_backend_module(preference):
+    from importlib import import_module
+    if preference == Preference.Gurobi:
+        try:
+            return import_module("ilpy.gurobi_wrap")
+        except ImportError:
+            print("Could not load Gurobi backend: module not found")
+    elif preference == Preference.Cplex:
+        try:
+            return import_module("ilpy.cplex_wrap")
+        except ImportError:
+            print("Could not load CPLEX backend: module not found")
+    elif preference == Preference.Scip:
+        try:
+            return import_module("ilpy.scip_wrap")
+        except ImportError as e:
+            print(f"Could not load SCIP backend: module not found {e}")
+
+    raise RuntimeError("No solver available.")
+
 cdef class Solver:
 
     cdef shared_ptr[decl.SolverBackend] p
@@ -253,53 +273,54 @@ cdef class Solver:
             default_variable_type,
             dict variable_types=None,
             Preference preference=Preference.Any):
-        cdef decl.SolverFactory factory
         cdef cppmap[unsigned int, decl.VariableType] vtypes
         if variable_types is not None:
             for k, v in variable_types.items():
                 vtypes[k] = v
-        self.p = factory.createSolverBackend(preference)
-        self.num_variables = num_variables
-        deref(self.p).initialize(num_variables, default_variable_type, vtypes)
 
-    def set_objective(self, objective: Objective | "Expression"):
-        cdef Objective obj
-        if hasattr(objective, "as_objective"):
-            obj = objective.as_objective()
-        else:
-            obj = objective
-        deref(self.p).setObjective(obj.p[0])
+    #     cdef decl.SolverFactory factory
+    #     self.p = factory.createSolverBackend(preference)
+    #     self.num_variables = num_variables
+    #     deref(self.p).initialize(num_variables, default_variable_type, vtypes)
 
-    def set_constraints(self, Constraints constraints):
-        deref(self.p).setConstraints(constraints.p[0])
+    # def set_objective(self, objective: Objective | "Expression"):
+    #     cdef Objective obj
+    #     if hasattr(objective, "as_objective"):
+    #         obj = objective.as_objective()
+    #     else:
+    #         obj = objective
+    #     deref(self.p).setObjective(obj.p[0])
 
-    def add_constraint(self, constraint: Constraint | "Expression"):
-        cdef Constraint const
-        if hasattr(constraint, "as_constraint"):
-            const = constraint.as_constraint()
-        else:
-            const = constraint
-        deref(self.p).addConstraint(const.p[0])
+    # def set_constraints(self, Constraints constraints):
+    #     deref(self.p).setConstraints(constraints.p[0])
 
-    def set_timeout(self, timeout):
-        deref(self.p).setTimeout(timeout)
+    # def add_constraint(self, constraint: Constraint | "Expression"):
+    #     cdef Constraint const
+    #     if hasattr(constraint, "as_constraint"):
+    #         const = constraint.as_constraint()
+    #     else:
+    #         const = constraint
+    #     deref(self.p).addConstraint(const.p[0])
 
-    def set_optimality_gap(self, gap, absolute=False):
-        deref(self.p).setOptimalityGap(gap, absolute)
+    # def set_timeout(self, timeout):
+    #     deref(self.p).setTimeout(timeout)
 
-    def set_num_threads(self, num_threads):
-        deref(self.p).setNumThreads(num_threads)
+    # def set_optimality_gap(self, gap, absolute=False):
+    #     deref(self.p).setOptimalityGap(gap, absolute)
 
-    def set_verbose(self, verbose):
-        deref(self.p).setVerbose(verbose)
+    # def set_num_threads(self, num_threads):
+    #     deref(self.p).setNumThreads(num_threads)
 
-    def set_event_callback(self, callback):
-        if callback is not None and not callable(callback):
-            raise TypeError("callback must be callable")
-        cdef PyObject* callback_ptr = <PyObject*>callback
-        deref(self.p).setEventCallback(callback_ptr)
+    # def set_verbose(self, verbose):
+    #     deref(self.p).setVerbose(verbose)
 
-    def solve(self):
-        solution = Solution(self.num_variables)
-        deref(self.p).solve(solution.p[0], solution._status)
-        return solution
+    # def set_event_callback(self, callback):
+    #     if callback is not None and not callable(callback):
+    #         raise TypeError("callback must be callable")
+    #     cdef PyObject* callback_ptr = <PyObject*>callback
+    #     deref(self.p).setEventCallback(callback_ptr)
+
+    # def solve(self):
+    #     solution = Solution(self.num_variables)
+    #     deref(self.p).solve(solution.p[0], solution._status)
+    #     return solution
